@@ -6,6 +6,10 @@ const generateTaskUI = (task) => {
     taskName.classList.add('task-name')
     taskName.innerText = task.taskName
 
+    const fromProject = document.createElement('div')
+    fromProject.classList.add('from-project')
+    fromProject.innerText = "from project: " + task.project
+
     const taskDescription = document.createElement('div')
     taskDescription.classList.add('task-description')
     taskDescription.innerText = task.description
@@ -15,6 +19,7 @@ const generateTaskUI = (task) => {
     taskDeadLine.innerText = task.deadLine
 
     taskElement.appendChild(taskName)
+    taskElement.appendChild(fromProject)
     taskElement.appendChild(taskDeadLine)
     taskElement.appendChild(taskDescription)
 

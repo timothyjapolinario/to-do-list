@@ -35,6 +35,7 @@ const createForm = () =>{
     const newTaskDescription = document.createElement('textarea')
     newTaskDescription.id = "task-description-input"
     newTaskDescription.required = true
+    newTaskDescription.rows = "10"
 
     const dateElement = document.createElement('input')
     dateElement.type = "date"
