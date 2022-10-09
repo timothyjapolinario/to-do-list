@@ -24,7 +24,6 @@ const initializeDefaultProject = () =>{
         const defaultProject = Project("DefaultProject", TaskList())
         Storage.addItem("DefaultProject", "default-project", defaultProject, "Project Exist!")
         setActiveProject("DefaultProject")
-        
     }
 }
 
@@ -40,6 +39,10 @@ const initEventListeners = () =>{
     tasksUI.addEventListener('click', ()=>{
         removeSelectedProject()
         renderAllTasks()
+    })
+    const allImportantTaskButton = document.querySelector(".all-important-button")
+    allImportantTaskButton.addEventListener('click', ()=>{
+        renderAllImportantTask()
     })
     const addFormButton = document.querySelectorAll(".toggle-form-button")
     addFormButton.forEach(button =>{
@@ -140,7 +143,19 @@ const setActiveProject = (key) =>{
         Storage.addItem("ActiveProject","active_project",{projectKey: key},"Active Project Exist!")
     }
 }
-
+const renderAllImportantTask = ()=>{
+    removeAllTaskElement()
+    const storeProjects = Storage.getAllStoreObjects('project')
+    storeProjects.forEach(storeProject=>{
+         storeProject.object.taskList.tasks.forEach(task=>{
+            console.log(task.important)
+            if(task.important){
+                const taskListUI = document.querySelector('.task-list')
+                taskListUI.appendChild(generateTaskUI(task)) 
+            }
+         })
+    })
+}
 const renderAllTasks = ()=>{
     removeAllTaskElement()
    const storeProjects = Storage.getAllStoreObjects('project')
@@ -171,10 +186,11 @@ const addTask = () =>{
     const taskName = document.querySelector('#task-name-input').value
     const taskDescription = document.querySelector('#task-description-input').value
     const taskDateInput = document.querySelector("#task-date-input").value
+    const isImportant = document.querySelector("#task-importance-input").checked
     if((taskName == "")||(taskDescription == "")||(taskDateInput == "")){
         return console.log("Invalid input")
     }
-    const newTask = Task(taskName, taskDescription, getDateInput(taskDateInput) , false, activeProject.projectName)
+    const newTask = Task(taskName, taskDescription, getDateInput(taskDateInput) , isImportant, activeProject.projectName)
     activeProject.taskList.tasks.push(newTask)
     defaultProject.taskList.tasks.push(newTask)
     Storage.updateItem(projectKey, activeProject)
