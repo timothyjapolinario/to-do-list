@@ -19,7 +19,6 @@ const loadHomePage = () => {
 
 const initializeDefaultProject = () =>{
     if(Storage.getItem("DefaultProject")!==null){
-        console.log("lol")
         setActiveProject("DefaultProject")
     }else{
         const defaultProject = Project("DefaultProject", TaskList())
@@ -55,14 +54,23 @@ const initEventListeners = () =>{
         addTask()
     })
     const submitProjectButton = document.querySelector("#submit-project-button")
+    
     submitProjectButton.addEventListener('click', ()=>{
-        addProject()
+        const projectName = document.querySelector("#project-name-input")
+        if(projectName.value == ''){
+            projectName.style.border ="2px solid red"
+            console.log("Invalid Input")
+            return
+        }
+        addProject(projectName.value)
+        projectName.style.border =""
     })
 }
-const addProject = ()=>{
-    const projectName = document.querySelector("#project-name-input").value
+
+
+
+const addProject = (projectName)=>{
     if(projectName == ""){
-        console.log("Project Name Empty")
         return
     }
     const project = Project(projectName, TaskList())
@@ -133,9 +141,6 @@ const setActiveProject = (key) =>{
     }
 }
 
-const loadAllProjectUI = () =>{
-    const parent = document.querySelector('')
-}
 const renderAllTasks = ()=>{
     removeAllTaskElement()
    const storeProjects = Storage.getAllStoreObjects('project')
@@ -149,7 +154,6 @@ const renderAllTasks = ()=>{
 }
 const renderTasks = ()=>{
     const activeProject = getActiveProject()
-    console.log(activeProject)
     if(activeProject !== null){
         const tasks = getActiveProject().taskList.tasks
         const taskListUI = document.querySelector('.task-list')
@@ -166,19 +170,24 @@ const addTask = () =>{
     const projectKey = Storage.getItem('ActiveProject').projectKey
     const taskName = document.querySelector('#task-name-input').value
     const taskDescription = document.querySelector('#task-description-input').value
-    const newTask = Task(taskName, taskDescription, getDateInput())
+    const taskDateInput = document.querySelector("#task-date-input").value
+    if((taskName == "")||(taskDescription == "")||(taskDateInput == "")){
+        return console.log("Invalid input")
+    }
+    const newTask = Task(taskName, taskDescription, getDateInput(taskDateInput) , false, activeProject.projectName)
     activeProject.taskList.tasks.push(newTask)
     defaultProject.taskList.tasks.push(newTask)
     Storage.updateItem(projectKey, activeProject)
     Storage.updateItem("DefaultProject", defaultProject)
     renderTasks()
     Form.toggleForm();
+    console.log(newTask)
 }
 const getDefaultProject = ()=>{
     return Storage.getItem("DefaultProject")
 }
-const getDateInput = () =>{
-    let taskDateInput = document.querySelector("#task-date-input").value
+const getDateInput = (taskDateInput) =>{
+    
     taskDateInput = taskDateInput.split("-")
     const taskDateInputInt = taskDateInput.map(date =>{
         date = parseInt(date)

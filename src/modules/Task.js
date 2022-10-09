@@ -2,11 +2,13 @@
 const taskInterface = (state) =>({
     type: 'taskInterface'
 })
-const Task = (taskName, description, deadLine) =>{
+const Task = (taskName, description, deadLine, important, project) =>{
     let state = {
         taskName: taskName,
         description: description,
-        deadLine: deadLine
+        deadLine: deadLine,
+        important: important,
+        project: project
     }
     return Object.assign(Object.create(taskInterface(state)), state)
 }
