@@ -1,0 +1,44 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="line-awesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src = 'main.js' defer></script>
+    <title>To-Do-List</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">TO-DO-LIST</div>
+        <div class="menu">
+            <div class="tasks-menu">
+                <div class="header-title">Tasks </div>
+                <div class="tasks-menu-option">Important Tasks!</div>
+                <div class="tasks-menu-option all-task-button">All Tasks</div>
+            </div>
+            <div class="project-menu">
+                <div class="project-header menu-header">
+                    <div class="header-title">Projects </div> 
+                    <div class="add-project-button">
+                        <img id = "add-project-icon"src="./images/add-icon.png" alt="add-project-icon">
+                    </div>
+                    <form class="add-project-form inactive" action="#">
+                        <label>Project Name </label>
+                        <div id="submit-project-button">Add!</div>
+                        <input type="text" id="project-name-input" required="true">
+                        
+                    </form>
+                </div>
+                <div class="project-list">
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="task-list">
+                <div class="toggle-form-button">Add Task!</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
