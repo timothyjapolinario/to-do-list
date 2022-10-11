@@ -34,6 +34,7 @@
 textarea{
     resize: none;
 }
+
 .input:invalid:required{
     border: 1px solid red;
 }
@@ -48,13 +49,24 @@ textarea{
 }
 .task{
     margin-top: 50px;
+    margin-left: 30px;
+    border-bottom: 1px solid black;
+    position: relative;
+}
+.complete-task-button>img{
+    height: 20px;
+    width: 20px;
+}
+.complete-task-button{
+    position: absolute;
+    left: -30px;
+    top: 8px;
+}
+
+.task-information{
     display: grid;
     grid-template-rows: 1fr 1fr;
     grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 1px solid black;
-}
-.task > *{
-    display: flex;
     align-items: center;
 }
 .from-project{
@@ -63,10 +75,25 @@ textarea{
 .task-deadline{
     grid-column-start: 2;
     grid-row-start: 1;
-    justify-self: end;
+    justify-self: start;
+}
+.edit-input{
+    position: absolute;
+    display: block;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999;
 }
 .task-name{
+    position: relative;
     font-size: 30px;
+}
+.task-description{
+    grid-column-start: 3;
+    grid-row-start: 1;
+    grid-row-end: 2;
 }
 label{
     height: fit-content;
@@ -76,6 +103,7 @@ label{
     padding: 0;
 }
 .header{
+    height: 90px;
     margin-bottom: 7px;
     padding-left: 3rem;
     padding-right: 3rem;
@@ -136,6 +164,7 @@ label{
     gap: 5px;
 }
 .project-name{
+    position: relative;
     color: var(--primary-light);
     margin-bottom: 10px;
 }
@@ -162,7 +191,7 @@ label{
     height: 15px;
 }
 
-.complete-button{
+.complete-project-button{
     display: flex;
     justify-content: center;
     width: 100%;
