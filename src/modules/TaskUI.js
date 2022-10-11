@@ -2,6 +2,16 @@ const generateTaskUI = (task) => {
     const taskElement = document.createElement('div')
     taskElement.classList.add('task')
 
+    const completeButton = document.createElement('div')
+    completeButton.classList.add('complete-task-button')
+    const completeImage = document.createElement('img')
+    completeImage.src="./images/empty-circle.png"
+    completeButton.appendChild(completeImage)
+
+    const taskInformations = document.createElement('div')
+    taskInformations.classList.add('task-information')
+
+    
     const taskName = document.createElement('div')
     taskName.classList.add('task-name')
     taskName.innerText = task.taskName
@@ -18,10 +28,13 @@ const generateTaskUI = (task) => {
     taskDeadLine.classList.add('task-deadline')
     taskDeadLine.innerText = task.deadLine
 
-    taskElement.appendChild(taskName)
-    taskElement.appendChild(fromProject)
-    taskElement.appendChild(taskDeadLine)
-    taskElement.appendChild(taskDescription)
+    taskInformations.appendChild(taskName)
+    taskInformations.appendChild(fromProject)
+    taskInformations.appendChild(taskDeadLine)
+    taskInformations.appendChild(taskDescription)
+
+    taskElement.appendChild(completeButton)
+    taskElement.appendChild(taskInformations)
 
 
     return taskElement

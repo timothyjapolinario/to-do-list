@@ -21,7 +21,7 @@ const initializeDefaultProject = () =>{
     if(Storage.getItem("DefaultProject")!==null){
         setActiveProject("DefaultProject")
     }else{
-        const defaultProject = Project("DefaultProject", TaskList())
+        const defaultProject = Project("DefaultProject", TaskList(), false)
         Storage.addItem("DefaultProject", "default-project", defaultProject, "Project Exist!")
         setActiveProject("DefaultProject")
     }
@@ -29,14 +29,16 @@ const initializeDefaultProject = () =>{
 
 const initializeDummyProject = () =>{
     if(Storage.getItem("DummyProject")===null){
-        const dummyProject = Project("DummyProject", TaskList())
+        const dummyProject = Project("DummyProject", TaskList(), false)
         Storage.addItem("DummyProject", "project", dummyProject, "Project Exist!")
     }
 }
 
 const initEventListeners = () =>{
+
     const tasksUI = document.querySelector(".all-task-button")
     tasksUI.addEventListener('click', ()=>{
+        setActiveProject("DefaultProject")
         removeSelectedProject()
         renderAllTasks()
     })
@@ -84,6 +86,7 @@ const addProject = (projectName)=>{
 const renderProject = (storageProject)=>{
     //add Project to Storage
     const projectList= document.querySelector(".project-list")
+    const completedProjectList = document.querySelector(".completed-project-list")
     const projectUI = generateProjectUI(storageProject.object, storageProject.key)
     projectUI.addEventListener('click', ()=>{
         if(storageProject.key != getActiveProjectKey()){
@@ -98,11 +101,18 @@ const renderProject = (storageProject)=>{
         projectUI.remove()
         renderAllTasks()
     })
+    projectUI.querySelector('.complete-project-button').addEventListener('click',()=>{
+        toggleCompletion(storageProject)
+    })
     const projectOptions = projectUI.querySelector('.project-options')
     projectUI.querySelector('.option-button').addEventListener('click', ()=>{
         toggleOptions(projectOptions)
     })
-    projectList.appendChild(projectUI)
+    if(storageProject.object.completeStatus){
+        completedProjectList.appendChild(projectUI)
+    }else{
+        projectList.appendChild(projectUI)
+    }
 }
 
 const getActiveProjectKey = ()=>{
@@ -117,7 +127,28 @@ const toggleOptions = (optionsUI) =>{
     optionsUI.classList.add('inactive')
 
 }
+const toggleCompletion = (storageProject) =>{
+    console.log(storageProject)
+    const project = storageProject.object
+    const key = storageProject.key
+    console.log(project)
+    console.log("-----")
+    if(project.completeStatus){
+        project.completeStatus = false
+    }else{
+        project.completeStatus = true
+    }
+    Storage.updateItem(key, project)
+    removeAllProjectUI()
+    loadAllProjects()
+}
+const removeAllProjectUI = ()=>{
+    const projectList= document.querySelector(".project-list")
+    const completedProjectList = document.querySelector(".completed-project-list")
 
+    removeAllChildNodes(projectList)
+    removeAllChildNodes(completedProjectList)
+}
 const removeSelectedProject = () =>{
     const previousSelectedProjectUI = document.querySelector('.selected-project')
     if(previousSelectedProjectUI !== null){
@@ -129,7 +160,6 @@ const removeSelectedProject = () =>{
 const loadAllProjects = () =>{
     //get list of projects in storage
     const storeProjects = Storage.getAllStoreObjectsWithKeys('project')
-    const parent = document.querySelector(".project-list")
     //for each project, get the ui element
     storeProjects.forEach(storeProject =>{
         renderProject(storeProject)
@@ -160,25 +190,74 @@ const renderAllTasks = ()=>{
     removeAllTaskElement()
    const storeProjects = Storage.getAllStoreObjects('project')
    storeProjects.forEach(storeProject=>{
-        storeProject.object.taskList.tasks.forEach(task=>{
+        storeProject.object.taskList.tasks.forEach((task,index)=>{
             const taskListUI = document.querySelector('.task-list')
-            taskListUI.appendChild(generateTaskUI(task)) 
+            const taskUI = generateTaskUI(task)
+            taskListUI.appendChild(taskUI) 
+            taskUI.querySelector('.complete-task-button').addEventListener('click',()=>{
+                completeTask(task,index)
+            })
+            const taskNameUI = taskUI.querySelector('.task-name')
+            taskNameUI.addEventListener('dblclick', ()=>{
+                editTaskName(task,index,taskNameUI)
+            })
         })
-        
    })
 }
 const renderTasks = ()=>{
     const activeProject = getActiveProject()
     if(activeProject !== null){
-        const tasks = getActiveProject().taskList.tasks
+        const tasks = activeProject.taskList.tasks
         const taskListUI = document.querySelector('.task-list')
         removeAllTaskElement()
-        tasks.forEach(task=>{
-            taskListUI.appendChild(generateTaskUI(task)) 
+        tasks.forEach((task,index)=>{
+            let taskUI = generateTaskUI(task)
+            taskListUI.appendChild(taskUI)
+            const taskNameUI = taskUI.querySelector('.task-name')
+            taskNameUI.addEventListener('dblclick', ()=>{
+                editTaskName(task,index,taskNameUI)
+            })
+            taskUI.querySelector('.complete-task-button').addEventListener('click',()=>{
+                completeTask(task,index)
+            })
         })
     }
 }
 
+const editTaskName = (task,index, element) =>{
+    const inputTaskName = document.createElement('input')
+    if(document.querySelector(".edit-input") === null){
+        inputTaskName.type = "text"
+        inputTaskName.classList.add('edit-input')
+        inputTaskName.addEventListener('focusout', ()=>{
+            if(inputTaskName.value != ""){
+                const project = Storage.getItem(task.project)
+                element.innerText = inputTaskName.value
+                task.taskName = inputTaskName.value
+                project.taskList.tasks[index] = task
+                Storage.updateItem(task.project, project)
+            }
+            inputTaskName.remove()
+        })
+        element.appendChild(inputTaskName)
+        inputTaskName.focus()
+
+    }
+}
+const completeTask = (task,index)=>{
+    const project = Storage.getItem(task.project)
+    const taskList = project.taskList.tasks
+
+    if(index > 0){
+        taskList.splice(index,index)
+    }else{
+        taskList.splice(index,1)
+    }
+    
+    console.log(taskList)
+    Storage.updateItem(task.project, project)
+    renderTasks()
+}
 const addTask = () =>{
     const activeProject = getActiveProject()
     const defaultProject = getDefaultProject()
@@ -226,8 +305,22 @@ const removeAllTaskElement = () => {
     })
 }
 
+const loadCompletedProjects = ()=>{
+    const storeProjects = Storage.getAllStoreObjectsWithKeys('project')
+    //for each project, get the ui element
+    storeProjects.forEach(storeProject =>{
+        if(storeProject.completeStatus){
+            renderCompletedProject(storeProject)
+        }
+    })
+}
+const renderCompletedProject = (project) =>{
 
-
-
+}
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
 
 export {loadHomePage}

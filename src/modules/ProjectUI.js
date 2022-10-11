@@ -22,7 +22,7 @@ const generateProjectUI = (project, id) => {
     const completeButton = document.createElement('div')
     const completeLogo = document.createElement('img')
     completeLogo.src = "./images/check-icon.png"
-    completeButton.classList.add('complete-button')
+    completeButton.classList.add('complete-project-button')
     completeButton.appendChild(completeLogo)
 
     const projectOptionButton = document.createElement('div')
