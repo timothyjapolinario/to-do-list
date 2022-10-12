@@ -24,6 +24,21 @@
     width: 15px;
     height: 15px;
 }
+div{
+    cursor: default ;
+}
+.selected-task-menu-option{
+    background-color: #13525c;
+}
+.tasks-menu-option,
+.toggle-form-button,
+.project-name,
+#add-project-icon,
+.task-name,
+.task-important-button
+{
+    cursor: pointer;
+}
 .add-form{
     position: relative;
     border: 3px solid #124a4b;

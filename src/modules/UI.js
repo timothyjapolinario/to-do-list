@@ -13,7 +13,6 @@ const loadHomePage = () => {
     renderAllTasks()
     initEventListeners()
     initializeDefaultProject()
-    initializeAllTaskProject()
     initializeDummyProject()
     loadAllProjects()
 }
@@ -23,19 +22,11 @@ const initializeDefaultProject = () =>{
         setActiveProject("DefaultProject")
     }else{
         const defaultProject = Project("DefaultProject", TaskList(), false)
-        Storage.addItem("DefaultProject", "default-project", defaultProject, "Project Exist!")
+        Storage.addItem("DefaultProject", "project", defaultProject, "Project Exist!")
         setActiveProject("DefaultProject")
     }
 }
-const initializeAllTaskProject = () =>{
-    if(Storage.getItem("AllTaskProject")!==null){
-        setActiveProject("AllTaskProject")
-    }else{
-        const defaultProject = Project("AllTaskProject", TaskList(), false)
-        Storage.addItem("AllTaskProject", "all-task-project", defaultProject, "Project Exist!")
-        setActiveProject("AllTaskProject")
-    }
-}
+
 const initializeDummyProject = () =>{
     if(Storage.getItem("DummyProject")===null){
         const dummyProject = Project("DummyProject", TaskList(), false)
@@ -52,6 +43,8 @@ const initEventListeners = () =>{
     const defaultProjectButton = document.querySelector('.default-project-button')
     defaultProjectButton.addEventListener('click', ()=>{
         setActiveProject('DefaultProject')
+        removeSelectedTaskMenu()
+        defaultProjectButton.classList.add('selected-task-menu-option')
         removeSelectedProject()
         renderTasks(getActiveProject())
     })
@@ -60,10 +53,15 @@ const initEventListeners = () =>{
     tasksUI.addEventListener('click', ()=>{
         setActiveProject('DefaultProject')
         removeSelectedProject()
+        removeSelectedTaskMenu()
+        tasksUI.classList.add('selected-task-menu-option')
         renderAllTasks()
     })
     const allImportantTaskButton = document.querySelector(".all-important-button")
     allImportantTaskButton.addEventListener('click', ()=>{
+        removeSelectedProject()
+        removeSelectedTaskMenu()
+        allImportantTaskButton.classList.add('selected-task-menu-option')
         renderAllImportantTask()
     })
     const addFormButton = document.querySelectorAll(".toggle-form-button")
@@ -89,6 +87,8 @@ const initEventListeners = () =>{
     const submitButton = document.querySelector("#submit-task-button")
     submitButton.addEventListener('click', ()=>{
         addTask()
+
+        wrapper.style.pointerEvents = "auto"
     })
     const submitProjectButton = document.querySelector("#submit-project-button")
     
@@ -105,6 +105,12 @@ const initEventListeners = () =>{
 }
 
 
+const removeSelectedTaskMenu = ()=>{
+    const selected = document.querySelector('.selected-task-menu-option')
+    if((selected !== null)){
+        selected.classList.remove('selected-task-menu-option')
+    }
+}
 
 const addProject = (projectName)=>{
     if(projectName == ""){
@@ -189,6 +195,7 @@ const removeAllProjectUI = ()=>{
 }
 const removeSelectedProject = () =>{
     const previousSelectedProjectUI = document.querySelector('.selected-project')
+    console.log("lol")
     if(previousSelectedProjectUI !== null){
         previousSelectedProjectUI.classList.remove('selected-project')
         previousSelectedProjectUI.querySelector('.project-options').classList.add('inactive')
@@ -200,7 +207,10 @@ const loadAllProjects = () =>{
     const storeProjects = Storage.getAllStoreObjectsWithKeys('project')
     //for each project, get the ui element
     storeProjects.forEach(storeProject =>{
-        renderProject(storeProject)
+        if(!(storeProject.key == "DefaultProject")){
+            renderProject(storeProject)
+        }
+        
     })
 }
 
@@ -215,11 +225,23 @@ const renderAllImportantTask = ()=>{
     removeAllTaskElement()
     const storeProjects = Storage.getAllStoreObjects('project')
     storeProjects.forEach(storeProject=>{
-         storeProject.object.taskList.tasks.forEach(task=>{
+         storeProject.object.taskList.tasks.forEach((task,index)=>{
             console.log(task.important)
             if(task.important){
                 const taskListUI = document.querySelector('.task-list')
-                taskListUI.appendChild(generateTaskUI(task)) 
+                const taskUI = generateTaskUI(task)
+                taskListUI.appendChild(taskUI) 
+                taskUI.querySelector('.complete-task-button').addEventListener('click',()=>{
+                    completeTask(task,index)
+                })
+                const taskNameUI = taskUI.querySelector('.task-name')
+                taskNameUI.addEventListener('dblclick', ()=>{
+                    editTaskName(task,index,taskNameUI)
+                })
+                const importantButton = taskUI.querySelector('.task-important-button')
+                importantButton.addEventListener('click',()=>{
+                    toggleTaskImportance(task,index,importantButton)
+                })
             }
          })
     })
@@ -344,7 +366,6 @@ const completeTask = (task,index)=>{
 }
 const addTask = () =>{
     const activeProject = getActiveProject()
-    const allTaskProject = getAllTaskProject()
     const projectKey = Storage.getItem('ActiveProject').projectKey
     const taskName = document.querySelector('#task-name-input').value
     const taskDescription = document.querySelector('#task-description-input').value
@@ -355,18 +376,13 @@ const addTask = () =>{
     }
     const newTask = Task(taskName, taskDescription, getDateInput(taskDateInput) , isImportant, activeProject.projectName)
     activeProject.taskList.tasks.push(newTask)
-    allTaskProject.taskList.tasks.push(newTask)
     Storage.updateItem(projectKey, activeProject)
-    Storage.updateItem("AllTaskProject", allTaskProject)
     renderTasks(activeProject)
     Form.toggleForm();
     console.log(newTask)
 }
 const getDefaultProject = ()=>{
     return Storage.getItem("DefaultProject")
-}
-const getAllTaskProject = ()=>{
-    return Storage.getItem("AllTaskProject")
 }
 const getDateInput = (taskDateInput) =>{
     
