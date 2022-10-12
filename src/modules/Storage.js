@@ -98,6 +98,7 @@ export {
     getItem,
     getAllItem, 
     getNewId,
+    getStoreObject,
     getAllStoreObjects, 
     updateItem,
     getAllStoreObjectsWithKeys,

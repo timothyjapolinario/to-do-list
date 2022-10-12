@@ -9,6 +9,7 @@ import * as ProjectForm from "./ProjectForm.js"
 import { format, compareAsc } from 'date-fns'
 const loadHomePage = () => {
     //localStorage.clear()
+    
     Form.createForm()
     renderAllTasks()
     initEventListeners()
@@ -18,6 +19,9 @@ const loadHomePage = () => {
 }
 
 const initializeDefaultProject = () =>{
+    if(Storage.getStoreObject("DefaultProject").identifier != "project"){
+        Storage.removeItem("DefaultProject")
+    }
     if(Storage.getItem("DefaultProject")!==null){
         setActiveProject("DefaultProject")
     }else{
