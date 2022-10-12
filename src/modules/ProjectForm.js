@@ -11,6 +11,7 @@ const toggleForm = () =>{
 
 const openForm = () =>{
     const popup = document.querySelector('.add-project-form')
+    popup.querySelector('#project-name-input').focus()
     popup.classList.remove('inactive')
 }
 

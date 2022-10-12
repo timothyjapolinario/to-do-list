@@ -17,11 +17,16 @@ const closeForm = (popup) =>{
 }
 
 const createForm = () =>{
-    const parent = document.querySelector('.main-content')
+    const parent = document.querySelector('body')
     const form = document.createElement('form')
     form.classList.add('add-form')
     form.classList.add('inactive')
     form.action = "#"
+
+
+    const closeButton = document.createElement('img')
+    closeButton.src = "./images/close-icon.png"
+    closeButton.classList.add('close-button-new-task')
 
     const formTitle = document.createElement('div')
     formTitle.innerText = "New Task!"
@@ -73,6 +78,7 @@ const createForm = () =>{
     wrapperImportance.appendChild(newTaskImportance)
 
     form.appendChild(formTitle)
+    form.append(closeButton)
     form.appendChild(labelTaskName)
     form.appendChild(newTaskNameInput)
     form.appendChild(labelTaskDescription)

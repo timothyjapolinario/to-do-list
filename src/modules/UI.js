@@ -44,6 +44,11 @@ const initializeDummyProject = () =>{
 }
 
 const initEventListeners = () =>{
+    window.addEventListener('click', function(e){   
+        if (!document.querySelector('.project-header').contains(e.target)){
+          ProjectForm.closeForm()
+        }
+      });
     const defaultProjectButton = document.querySelector('.default-project-button')
     defaultProjectButton.addEventListener('click', ()=>{
         setActiveProject('DefaultProject')
@@ -62,12 +67,24 @@ const initEventListeners = () =>{
         renderAllImportantTask()
     })
     const addFormButton = document.querySelectorAll(".toggle-form-button")
+    const wrapper = document.querySelector(".wrapper")
     addFormButton.forEach(button =>{
-        button.addEventListener('click',Form.toggleForm)
+        button.addEventListener('click',()=>{
+            Form.toggleForm()
+            wrapper.style.pointerEvents = "none"
+        })
+    })
+
+    const closeFormButton = document.querySelector(".close-button-new-task")
+    closeFormButton.addEventListener('click',()=>{
+        Form.toggleForm()
+        wrapper.style.pointerEvents = "auto"
     })
     const addProjectButton = document.querySelector(".add-project-button")
+    const projectNameInput = document.querySelector('#project-name-input')
     addProjectButton.addEventListener('click',()=>{
         ProjectForm.toggleForm()
+        projectNameInput.focus()
     })
     const submitButton = document.querySelector("#submit-task-button")
     submitButton.addEventListener('click', ()=>{
