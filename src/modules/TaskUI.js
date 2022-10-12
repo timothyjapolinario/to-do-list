@@ -11,7 +11,15 @@ const generateTaskUI = (task) => {
     const taskInformations = document.createElement('div')
     taskInformations.classList.add('task-information')
 
-    
+    const importantButton = document.createElement('div')
+    importantButton.classList.add('task-important-button')
+    if(task.important){
+        importantButton.innerText = "Important!!"
+        importantButton.classList.add('important')
+    }else{
+        importantButton.innerText = "Not Important"
+    }
+
     const taskName = document.createElement('div')
     taskName.classList.add('task-name')
     taskName.innerText = task.taskName
@@ -32,7 +40,8 @@ const generateTaskUI = (task) => {
     taskInformations.appendChild(fromProject)
     taskInformations.appendChild(taskDeadLine)
     taskInformations.appendChild(taskDescription)
-
+    taskInformations.appendChild(importantButton)
+    
     taskElement.appendChild(completeButton)
     taskElement.appendChild(taskInformations)
 

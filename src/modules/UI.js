@@ -13,6 +13,7 @@ const loadHomePage = () => {
     renderAllTasks()
     initEventListeners()
     initializeDefaultProject()
+    initializeAllTaskProject()
     initializeDummyProject()
     loadAllProjects()
 }
@@ -26,7 +27,15 @@ const initializeDefaultProject = () =>{
         setActiveProject("DefaultProject")
     }
 }
-
+const initializeAllTaskProject = () =>{
+    if(Storage.getItem("AllTaskProject")!==null){
+        setActiveProject("AllTaskProject")
+    }else{
+        const defaultProject = Project("AllTaskProject", TaskList(), false)
+        Storage.addItem("AllTaskProject", "all-task-project", defaultProject, "Project Exist!")
+        setActiveProject("AllTaskProject")
+    }
+}
 const initializeDummyProject = () =>{
     if(Storage.getItem("DummyProject")===null){
         const dummyProject = Project("DummyProject", TaskList(), false)
@@ -35,10 +44,16 @@ const initializeDummyProject = () =>{
 }
 
 const initEventListeners = () =>{
+    const defaultProjectButton = document.querySelector('.default-project-button')
+    defaultProjectButton.addEventListener('click', ()=>{
+        setActiveProject('DefaultProject')
+        removeSelectedProject()
+        renderTasks(getActiveProject())
+    })
 
     const tasksUI = document.querySelector(".all-task-button")
     tasksUI.addEventListener('click', ()=>{
-        setActiveProject("DefaultProject")
+        setActiveProject('DefaultProject')
         removeSelectedProject()
         renderAllTasks()
     })
@@ -92,7 +107,7 @@ const renderProject = (storageProject)=>{
         if(storageProject.key != getActiveProjectKey()){
             setActiveProject(storageProject.key)
             removeSelectedProject()
-            renderTasks()
+            renderTasks(getActiveProject())
         }
         projectUI.classList.add('selected-project')
     })
@@ -108,6 +123,12 @@ const renderProject = (storageProject)=>{
     projectUI.querySelector('.option-button').addEventListener('click', ()=>{
         toggleOptions(projectOptions)
     })
+
+    const projectName = projectUI.querySelector(".project-name")
+    projectName.addEventListener('dblclick',()=>{
+        editProjectName(storageProject.key, projectName)
+    })
+
     if(storageProject.object.completeStatus){
         completedProjectList.appendChild(projectUI)
     }else{
@@ -189,6 +210,7 @@ const renderAllImportantTask = ()=>{
 const renderAllTasks = ()=>{
     removeAllTaskElement()
    const storeProjects = Storage.getAllStoreObjects('project')
+   const defaultProject = Storage.getItem('DefaultProject')
    storeProjects.forEach(storeProject=>{
         storeProject.object.taskList.tasks.forEach((task,index)=>{
             const taskListUI = document.querySelector('.task-list')
@@ -201,13 +223,16 @@ const renderAllTasks = ()=>{
             taskNameUI.addEventListener('dblclick', ()=>{
                 editTaskName(task,index,taskNameUI)
             })
+            const importantButton = taskUI.querySelector('.task-important-button')
+            importantButton.addEventListener('click',()=>{
+                toggleTaskImportance(task,index,importantButton)
+            })
         })
    })
 }
-const renderTasks = ()=>{
-    const activeProject = getActiveProject()
-    if(activeProject !== null){
-        const tasks = activeProject.taskList.tasks
+const renderTasks = (project)=>{
+    if(project !== null){
+        const tasks = project.taskList.tasks
         const taskListUI = document.querySelector('.task-list')
         removeAllTaskElement()
         tasks.forEach((task,index)=>{
@@ -220,10 +245,52 @@ const renderTasks = ()=>{
             taskUI.querySelector('.complete-task-button').addEventListener('click',()=>{
                 completeTask(task,index)
             })
+            const importantButton = taskUI.querySelector('.task-important-button')
+            importantButton.addEventListener('click',()=>{
+                toggleTaskImportance(task, index,importantButton)
+            })
         })
     }
 }
+const toggleTaskImportance = (task,index, element) =>{
+    console.log("lol")
+    const project = Storage.getItem(task.project)
+    if(task.important){
+        task.important = false
+        element.innerText = "Not Important"
+        element.classList.remove('important')
+    }else{
+        task.important = true
+        element.innerText = "Important!!"
+        element.classList.add('important')
+    }
+    project.taskList.tasks[index] = task
+    Storage.updateItem(task.project, project)
+    console.log(project)
+}
+const editProjectName = (projectKey, element) =>{
+    const project = Storage.getItem(projectKey)
+    const inputProjectName = document.createElement('input')
 
+    if(document.querySelector(".edit-input") === null){
+        inputProjectName.type = "text"
+        inputProjectName.classList.add('edit-input')
+        inputProjectName.addEventListener('focusout', ()=>{
+            console.log("focusout!")
+            if(inputProjectName.value != ""){
+                element.innerText = inputProjectName.value
+                console.log(project.projectName)
+                project.projectName = inputProjectName.value
+                console.log(project.projectName)
+                Storage.addItem(inputProjectName.value, 'project', project, "Error updating project")
+                Storage.removeItem(projectKey)
+            }
+            inputProjectName.remove()
+        })
+        element.appendChild(inputProjectName)
+        inputProjectName.focus()
+    }
+}
 const editTaskName = (task,index, element) =>{
     const inputTaskName = document.createElement('input')
     if(document.querySelector(".edit-input") === null){
@@ -256,11 +323,11 @@ const completeTask = (task,index)=>{
     
     console.log(taskList)
     Storage.updateItem(task.project, project)
-    renderTasks()
+    renderTasks(getActiveProject())
 }
 const addTask = () =>{
     const activeProject = getActiveProject()
-    const defaultProject = getDefaultProject()
+    const allTaskProject = getAllTaskProject()
     const projectKey = Storage.getItem('ActiveProject').projectKey
     const taskName = document.querySelector('#task-name-input').value
     const taskDescription = document.querySelector('#task-description-input').value
@@ -271,15 +338,18 @@ const addTask = () =>{
     }
     const newTask = Task(taskName, taskDescription, getDateInput(taskDateInput) , isImportant, activeProject.projectName)
     activeProject.taskList.tasks.push(newTask)
-    defaultProject.taskList.tasks.push(newTask)
+    allTaskProject.taskList.tasks.push(newTask)
     Storage.updateItem(projectKey, activeProject)
-    Storage.updateItem("DefaultProject", defaultProject)
-    renderTasks()
+    Storage.updateItem("AllTaskProject", allTaskProject)
+    renderTasks(activeProject)
     Form.toggleForm();
     console.log(newTask)
 }
 const getDefaultProject = ()=>{
     return Storage.getItem("DefaultProject")
+}
+const getAllTaskProject = ()=>{
+    return Storage.getItem("AllTaskProject")
 }
 const getDateInput = (taskDateInput) =>{
     

@@ -86,6 +86,17 @@ textarea{
     left: 0;
     z-index: 999;
 }
+.task-important-button{
+    background-color: var(--primary);
+    max-width: 100px;
+    text-align: center;
+    padding: 5px;
+    border-radius: 10px;
+}
+.important{
+    background-color: #b12952;
+}
+
 .task-name{
     position: relative;
     font-size: 30px;
