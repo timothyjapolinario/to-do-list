@@ -1,22 +1,14 @@
-import * as Storage from './Storage.js'
+import * as Storage from "./Storage";
 
-const addProject =(newProject) => {
-    if(newProject.type == "projectInterface"){
-        Storage.addItem(newProject.projectName,"task",newTask)
-    }
-}
-const removeProject = (projectName) => {
-    
-}
+const addProject = (newProject) => {
+  if (newProject.type === "projectInterface") {
+    Storage.addItem(newProject.projectName, "task", newProject);
+  }
+};
 
-const getAllProject = () =>{
-    const projectsFromLocal = Storage.getAllItem("project");
-    return projectsFromLocal
-}
+const getAllProject = () => {
+  const projectsFromLocal = Storage.getAllItem("project");
+  return projectsFromLocal;
+};
 
-
-
-
-export {addProject, removeProject, getAllProject}
-
-
+export { addProject, getAllProject };

@@ -1,3 +1,3 @@
-import * as UI from "./modules/UI.js";
+import * as UI from "./modules/UI";
 
-UI.loadHomePage()
+UI.loadHomePage();

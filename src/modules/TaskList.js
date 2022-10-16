@@ -1,24 +1,19 @@
-import * as Storage from './Storage.js'
+import * as Storage from "./Storage";
 
-const taskListInterface = (state) => ({
-    type: "taskListInterface"
-})
+const taskListInterface = () => ({
+  type: "taskListInterface",
+});
 
-const TaskList = ()=>{
-    let state = {
-        tasks:[],
-        addTask: (newTask) => {
-            if(newTask.type == "taskInterface"){
-                Storage.addItem(newTask.taskName,"task",newTask)
-            }
-        },
-        getAllTask: () =>{
-            return task
-        },
-    }
-    return Object.assign(Object.create(taskListInterface(state)), state)
-}
+const TaskList = () => {
+  const state = {
+    tasks: [],
+    addTask: (newTask) => {
+      if (newTask.type === "taskInterface") {
+        Storage.addItem(newTask.taskName, "task", newTask);
+      }
+    },
+  };
+  return Object.assign(Object.create(taskListInterface(state)), state);
+};
 
-export default TaskList
-
-
+export default TaskList;
